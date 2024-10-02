@@ -411,12 +411,12 @@
           const div = document.createElement("div");
           div.className = "flex items-center space-x-2";
           div.innerHTML = `
-                    <input type="checkbox" id="${elective}" class="form-checkbox h-5 w-5 text-blue-600">
-                    <label for="${elective}" class="text-sm text-gray-700">${elective}</label>
-                    <select id="${elective}-grade" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" disabled>
-                        <option value="">Select grade</option>
-                    </select>
-                `;
+            <input type="checkbox" id="${elective}" class="form-checkbox h-5 w-5 text-blue-600">
+            <label for="${elective}" class="text-sm text-gray-700">${elective}</label>
+            <select id="${elective}-grade" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" disabled>
+                <option value="">Select grade</option>
+            </select>
+        `;
           electivesList.appendChild(div);
 
           const checkbox = div.querySelector('input[type="checkbox"]');
@@ -430,9 +430,15 @@
               selectedElectives = selectedElectives.filter(
                 (e) => e !== elective
               );
+              gradeDropdown.value = ""; // Reset grade when unchecked
             }
             updateCheckEligibilityButton();
           });
+
+          gradeDropdown.addEventListener(
+            "change",
+            updateCheckEligibilityButton
+          );
         });
         populateGradeDropdowns();
       }
@@ -441,16 +447,16 @@
         const coreSubjectsSelected = ["english", "math", "science"].every(
           (id) => document.getElementById(id).value !== ""
         );
-        const enoughElectivesSelected = selectedElectives.length >= 3;
-        const allSelectedElectivesHaveGrades = selectedElectives.every(
+        const selectedElectivesWithGrades = selectedElectives.filter(
           (elective) =>
             document.getElementById(`${elective}-grade`).value !== ""
         );
+        const enoughElectivesSelected = selectedElectivesWithGrades.length >= 3;
+
         checkEligibilityBtn.disabled = !(
           programSelect.value &&
           coreSubjectsSelected &&
-          enoughElectivesSelected &&
-          allSelectedElectivesHaveGrades
+          enoughElectivesSelected
         );
       }
 
