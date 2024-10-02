@@ -393,6 +393,8 @@
           'select[id$="-grade"], #english, #math, #science, #socialStudies'
         );
         gradeDropdowns.forEach((dropdown) => {
+          // Clear existing options first
+          dropdown.innerHTML = '<option value="">Select grade</option>';
           grades.forEach((grade) => {
             const option = document.createElement("option");
             option.value = grade;
@@ -401,6 +403,7 @@
           });
         });
       }
+
       function populateElectives(program) {
         electivesList.innerHTML = "";
         selectedElectives = [];
@@ -430,9 +433,8 @@
             }
             updateCheckEligibilityButton();
           });
-
-          populateGradeDropdowns();
         });
+        populateGradeDropdowns();
       }
 
       function updateCheckEligibilityButton() {
@@ -491,50 +493,73 @@
             if (!coreSubjectsMet) return false;
 
             // Check electives
-            let electivesRequirementMet = false;
-            if (requirements.electives[0].startsWith("Any three from:")) {
-              const allowedElectives = requirements.electives[0]
-                .split(":")[1]
-                .split(",")
-                .map((e) => e.trim());
-              electivesRequirementMet =
-                Object.keys(electiveGrades).filter((e) =>
-                  allowedElectives.includes(e)
-                ).length >= 3;
-            } else if (
-              requirements.electives[0] ===
-              "Any three from General Science, General Arts, or Business electives"
-            ) {
-              electivesRequirementMet = Object.keys(electiveGrades).length >= 3;
-            } else {
-              electivesRequirementMet = requirements.electives.every(
-                (elective) => {
-                  if (elective.includes(" or ")) {
-                    return elective
-                      .split(" or ")
-                      .some(
-                        (e) =>
-                          electiveGrades[e] && isPassingGrade(electiveGrades[e])
-                      );
-                  }
-                  return (
-                    electiveGrades[elective] &&
-                    isPassingGrade(electiveGrades[elective])
-                  );
-                }
-              );
-            }
-
-            return electivesRequirementMet;
+            return checkElectiveRequirements(
+              requirements.electives,
+              electiveGrades
+            );
           })
           .map(([course]) => course);
 
         displayEligibilityResults(eligibleCourses);
       }
 
+      function checkElectiveRequirements(requiredElectives, electiveGrades) {
+        if (typeof requiredElectives === "string") {
+          requiredElectives = [requiredElectives];
+        }
+
+        return requiredElectives.every((requirement) => {
+          if (requirement.startsWith("Any three from:")) {
+            const allowedElectives = requirement
+              .split(":")[1]
+              .split(",")
+              .map((e) => e.trim());
+            return (
+              Object.keys(electiveGrades).filter(
+                (e) =>
+                  allowedElectives.includes(e) &&
+                  isPassingGrade(electiveGrades[e])
+              ).length >= 3
+            );
+          }
+
+          if (
+            requirement ===
+            "Any three from General Science, General Arts, or Business electives"
+          ) {
+            return (
+              Object.keys(electiveGrades).filter((e) =>
+                isPassingGrade(electiveGrades[e])
+              ).length >= 3
+            );
+          }
+
+          if (requirement.includes(" or ")) {
+            return requirement
+              .split(" or ")
+              .some(
+                (e) => electiveGrades[e] && isPassingGrade(electiveGrades[e])
+              );
+          }
+
+          if (requirement.includes(" and/or ")) {
+            const [subject1, subject2] = requirement.split(" and/or ");
+            return (
+              (electiveGrades[subject1] &&
+                isPassingGrade(electiveGrades[subject1])) ||
+              (electiveGrades[subject2] &&
+                isPassingGrade(electiveGrades[subject2]))
+            );
+          }
+
+          return (
+            electiveGrades[requirement] &&
+            isPassingGrade(electiveGrades[requirement])
+          );
+        });
+      }
+
       function isPassingGrade(grade) {
-        // Implement your grade validation logic here
-        // For example, consider A1-C6 as passing grades
         const passingGrades = ["A1", "B2", "B3", "C4", "C5", "C6"];
         return passingGrades.includes(grade.toUpperCase());
       }
@@ -593,11 +618,13 @@
         checkEligibilityBtn.disabled = true;
       }
 
-      // Initialize core subject input listeners
-      document.querySelectorAll("#coreSubjects input").forEach((input) => {
-        input.addEventListener("input", updateCheckEligibilityButton);
-      });
+      // Initialize grade dropdowns
       populateGradeDropdowns();
+
+      // Initialize core subject input listeners
+      document.querySelectorAll("#coreSubjects select").forEach((select) => {
+        select.addEventListener("change", updateCheckEligibilityButton);
+      });
     </script>
   </body>
 </html>
