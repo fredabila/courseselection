@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 min-h-screen py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-2xl mx-auto space-y-8">
+    <div class="max-w-4xl mx-auto space-y-8">
         <div class="bg-white shadow-xl rounded-lg p-6">
             <h1 class="text-2xl font-bold text-center text-gray-900 mb-2">Course Eligibility Checker</h1>
             <p class="text-center text-gray-600 mb-6">University of Mines and Technology</p>
@@ -23,9 +23,32 @@
                     </select>
                 </div>
 
-                <div id="electivesContainer" class="hidden">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Select your electives:</label>
-                    <div id="electivesList" class="space-y-2"></div>
+                <div id="coreSubjects" class="space-y-2">
+                    <h2 class="text-lg font-semibold">Core Subjects</h2>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="english" class="block text-sm font-medium text-gray-700">English Language</label>
+                            <input type="text" id="english" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" placeholder="Enter grade">
+                        </div>
+                        <div>
+                            <label for="math" class="block text-sm font-medium text-gray-700">Mathematics</label>
+                            <input type="text" id="math" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" placeholder="Enter grade">
+                        </div>
+                        <div>
+                            <label for="science" class="block text-sm font-medium text-gray-700">Integrated Science</label>
+                            <input type="text" id="science" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" placeholder="Enter grade">
+                        </div>
+                        <div>
+                            <label for="socialStudies" class="block text-sm font-medium text-gray-700">Social Studies (optional)</label>
+                            <input type="text" id="socialStudies" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" placeholder="Enter grade (if applicable)">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="electivesContainer" class="hidden space-y-2">
+                    <h2 class="text-lg font-semibold">Elective Subjects</h2>
+                    <p class="text-sm text-gray-600 mb-2">Select at least 3 electives and enter your grades:</p>
+                    <div id="electivesList" class="grid grid-cols-2 gap-4"></div>
                 </div>
 
                 <button id="checkEligibility" class="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 disabled:bg-gray-400" disabled>Check Eligibility</button>
@@ -47,80 +70,161 @@
         const programs = ["General Science", "General Arts", "Business"];
 
         const electives = {
-            "General Science": ["Physics", "Chemistry", "Elective Mathematics", "Biology", "Geography", "Applied Electricity", "Technical Drawing", "Metal Work"],
-            "General Arts": ["Economics", "Geography", "Elective Mathematics", "ICT", "History", "Government"],
-            "Business": ["Accounting", "Business Management", "Economics", "Costing", "ICT", "Elective Mathematics"]
+            "General Science": [
+                "Physics", "Chemistry", "Elective Mathematics", "Biology", "Geography", 
+                "Applied Electricity", "Electronics", "ICT", "Computer Studies", 
+                "Technical Drawing", "Metal Work"
+            ],
+            "General Arts": [
+                "Economics", "Geography", "Elective Mathematics", "ICT", "History", 
+                "Government", "Christian Religious Studies", "French", "Literature in English", 
+                "Ghanaian Language"
+            ],
+            "Business": [
+                "Accounting", "Business Management", "Economics", "Costing", 
+                "ICT", "Elective Mathematics"
+            ]
         };
 
         const courseRequirements = {
             "BSc Mining Engineering": {
+                faculty: "Faculty of Mining and Minerals Technology",
                 core: ["English Language", "Mathematics", "Integrated Science"],
                 electives: ["Physics", "Chemistry", "Elective Mathematics"],
                 program: "General Science"
             },
             "BSc Minerals Engineering": {
+                faculty: "Faculty of Mining and Minerals Technology",
                 core: ["English Language", "Mathematics", "Integrated Science"],
                 electives: ["Physics", "Chemistry", "Elective Mathematics"],
                 program: "General Science"
             },
             "BSc Geomatic Engineering": {
+                faculty: "Faculty of Geosciences and Environmental Studies",
                 core: ["English Language", "Mathematics", "Integrated Science"],
                 electives: ["Physics", "Elective Mathematics", "Chemistry or Geography"],
-                program: "General Science"
+                program: "General Science",
+                note: "Can substitute Chemistry with Geography"
             },
             "BSc Geological Engineering": {
+                faculty: "Faculty of Geosciences and Environmental Studies",
                 core: ["English Language", "Mathematics", "Integrated Science"],
                 electives: ["Physics", "Chemistry", "Elective Mathematics"],
                 program: "General Science"
             },
             "BSc Environmental and Safety Engineering": {
+                faculty: "Faculty of Geosciences and Environmental Studies",
                 core: ["English Language", "Mathematics", "Integrated Science"],
                 electives: ["Physics", "Chemistry", "Elective Mathematics"],
                 program: "General Science"
             },
             "BSc Land Administration and Information Systems": {
+                faculty: "Faculty of Geosciences and Environmental Studies",
                 core: ["English Language", "Mathematics", "Integrated Science"],
                 electives: ["Any three from: Economics, Geography, Elective Mathematics, ICT, History, Government"],
-                program: "General Arts"
+                program: "Any",
+                note: "Credits in any three (3) Business or Science electives or General Arts electives"
             },
             "BSc Spatial Planning": {
+                faculty: "Faculty of Geosciences and Environmental Studies",
                 core: ["English Language", "Mathematics", "Integrated Science"],
                 electives: ["Any three from: Economics, Geography, Elective Mathematics, ICT, History, Government"],
-                program: "General Arts"
+                program: "Any",
+                note: "Credits in any three (3) Business or Science electives or General Arts electives"
             },
-            "BSc Computer Science and Engineering": {
+            "BSc Petroleum Engineering": {
+                faculty: "School of Petroleum Studies",
                 core: ["English Language", "Mathematics", "Integrated Science"],
-                electives: ["Elective Mathematics", "Physics", "Chemistry or ICT or Applied Electricity"],
+                electives: ["Physics", "Chemistry", "Elective Mathematics"],
+                program: "General Science",
+                note: "Fee Paying Programme"
+            },
+            "BSc Natural Gas Engineering": {
+                faculty: "School of Petroleum Studies",
+                core: ["English Language", "Mathematics", "Integrated Science"],
+                electives: ["Physics", "Chemistry", "Elective Mathematics"],
                 program: "General Science"
             },
-            "BSc Mathematics": {
+            "BSc Petroleum Geosciences and Engineering": {
+                faculty: "School of Petroleum Studies",
                 core: ["English Language", "Mathematics", "Integrated Science"],
-                electives: ["Elective Mathematics", "Any two from: Physics, Chemistry, Biology, Applied Electricity, Technical Drawing, ICT, Metal Work, Economics, Geography, Accounting, Business Management, Costing"],
+                electives: ["Physics", "Chemistry", "Elective Mathematics"],
+                program: "General Science"
+            },
+            "BSc Petroleum Refining and Petrochemical Engineering": {
+                faculty: "School of Petroleum Studies",
+                core: ["English Language", "Mathematics", "Integrated Science"],
+                electives: ["Physics", "Chemistry", "Elective Mathematics"],
+                program: "General Science"
+            },
+            "BSc Chemical Engineering": {
+                faculty: "School of Petroleum Studies",
+                core: ["English Language", "Mathematics", "Integrated Science"],
+                electives: ["Physics", "Chemistry", "Elective Mathematics"],
+                program: "General Science"
+            },
+            "BSc Mechanical Engineering": {
+                faculty: "Faculty of Engineering",
+                core: ["English Language", "Mathematics", "Integrated Science"],
+                electives: ["Physics", "Chemistry or Technical Drawing or Metal Work", "Elective Mathematics"],
+                program: "General Science",
+                note: "Can substitute Chemistry with Technical Drawing or Metal Work"
+            },
+            "BSc Electrical and Electronic Engineering": {
+                faculty: "Faculty of Engineering",
+                core: ["English Language", "Mathematics", "Integrated Science"],
+                electives: ["Physics", "Chemistry or Applied Electricity or Electronics", "Elective Mathematics"],
+                program: "General Science",
+                note: "Can substitute Chemistry with Applied Electricity or Electronics"
+            },
+            "BSc Renewable Energy Engineering": {
+                faculty: "Faculty of Engineering",
+                core: ["English Language", "Mathematics", "Integrated Science"],
+                electives: ["Physics", "Chemistry or Applied Electricity or Electronics", "Elective Mathematics"],
+                program: "General Science",
+                note: "Can substitute Chemistry with Applied Electricity or Electronics"
+            },
+            "BSc Computer Science and Engineering": {
+                faculty: "Faculty of Computing and Mathematical Sciences",
+                core: ["English Language", "Mathematics", "Integrated Science"],
+                electives: ["Elective Mathematics", "Physics", "Chemistry or ICT or Computer Studies or Applied Electricity"],
+                program: "General Science",
+                note: "Can substitute Chemistry with ICT, Computer Studies or Applied Electricity"
+            },
+            "BSc Mathematics": {
+                faculty: "Faculty of Computing and Mathematical Sciences",
+                core: ["English Language", "Mathematics", "Integrated Science"],
+                electives: ["Elective Mathematics", "Any two from General Science, General Arts, or Business electives"],
                 program: "Any"
             },
             "BSc Statistical Data Science": {
+                faculty: "Faculty of Computing and Mathematical Sciences",
                 core: ["English Language", "Mathematics", "Integrated Science"],
-                electives: ["Elective Mathematics", "Any two from: Physics, Chemistry, Biology, Applied Electricity, Technical Drawing, ICT, Metal Work, Economics, Geography, Accounting, Business Management, Costing"],
+                electives: ["Elective Mathematics", "Any two from General Science, General Arts, or Business electives"],
                 program: "Any"
             },
             "BSc Cyber Security": {
+                faculty: "Faculty of Computing and Mathematical Sciences",
                 core: ["English Language", "Mathematics", "Integrated Science"],
-                electives: ["Any three from: Physics, Chemistry, Biology, Geography, ICT, Elective Mathematics, Economics, Accounting, Business Management, Costing"],
+                electives: ["Any three from General Science, General Arts, or Business electives"],
                 program: "Any"
             },
             "BSc Information Systems and Technology": {
+                faculty: "Faculty of Computing and Mathematical Sciences",
                 core: ["English Language", "Mathematics", "Integrated Science"],
-                electives: ["Any three from: Physics, Chemistry, Biology, Geography, ICT, Elective Mathematics, Economics, Accounting, Business Management, Costing"],
+                electives: ["Any three from General Science, General Arts, or Business electives"],
                 program: "Any"
             },
             "BSc Logistics and Transport Management": {
+                faculty: "Faculty of Integrated Management Science",
                 core: ["English Language", "Mathematics", "Integrated Science or Social Studies"],
-                electives: ["Any three from the program"],
+                electives: ["Any three from General Science, General Arts, or Business electives"],
                 program: "Any"
             },
             "BSc Economics and Industrial Organization": {
+                faculty: "Faculty of Integrated Management Science",
                 core: ["English Language", "Mathematics", "Integrated Science or Social Studies"],
-                electives: ["Economics and/or Elective Mathematics", "Any one or two from the program"],
+                electives: ["Economics and/or Elective Mathematics", "Any one or two from General Science, General Arts, or Business electives"],
                 program: "Any"
             }
         };
@@ -154,15 +258,19 @@
             selectedElectives = [];
             electives[program].forEach(elective => {
                 const div = document.createElement('div');
-                div.className = 'flex items-center';
+                div.className = 'flex items-center space-x-2';
                 div.innerHTML = `
-                    <input type="checkbox" id="${elective}" class="mr-2">
+                    <input type="checkbox" id="${elective}" class="form-checkbox h-5 w-5 text-blue-600">
                     <label for="${elective}" class="text-sm text-gray-700">${elective}</label>
+                    <input type="text" id="${elective}-grade" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" placeholder="Grade" disabled>
                 `;
                 electivesList.appendChild(div);
 
-                const checkbox = div.querySelector('input');
+                const checkbox = div.querySelector('input[type="checkbox"]');
+                const gradeInput = div.querySelector('input[type="text"]');
+                
                 checkbox.addEventListener('change', function() {
+                    gradeInput.disabled = !this.checked;
                     if (this.checked) {
                         selectedElectives.push(elective);
                     } else {
@@ -174,46 +282,75 @@
         }
 
         function updateCheckEligibilityButton() {
-            checkEligibilityBtn.disabled = !(programSelect.value && selectedElectives.length > 0);
+            const coreSubjectsEntered = ['english', 'math', 'science'].every(id => document.getElementById(id).value.trim() !== '');
+            const enoughElectivesSelected = selectedElectives.length >= 3;
+            checkEligibilityBtn.disabled = !(programSelect.value && coreSubjectsEntered && enoughElectivesSelected);
         }
+
+        document.querySelectorAll('#coreSubjects input').forEach(input => {
+            input.addEventListener('input', updateCheckEligibilityButton);
+        });
 
         checkEligibilityBtn.addEventListener('click', checkEligibility);
 
         function checkEligibility() {
             const selectedProgram = programSelect.value;
+            const coreGrades = {
+                'English Language': document.getElementById('english').value,
+                'Mathematics': document.getElementById('math').value,
+                'Integrated Science': document.getElementById('science').value,
+                'Social Studies': document.getElementById('socialStudies').value
+            };
+            
+            const electiveGrades = {};
+            selectedElectives.forEach(elective => {
+                electiveGrades[elective] = document.getElementById(`${elective}-grade`).value;
+            });
+
             const eligibleCourses = Object.entries(courseRequirements).filter(([course, requirements]) => {
                 if (requirements.program !== "Any" && requirements.program !== selectedProgram) {
                     return false;
                 }
-                
-                if (requirements.electives[0] === "Any three from the program") {
-                    return selectedElectives.length >= 3;
-                }
 
+                // Check core subjects
+                const coreSubjectsMet = requirements.core.every(subject => 
+                    coreGrades[subject] && isPassingGrade(coreGrades[subject])
+                );
+                if (!coreSubjectsMet) return false;
+
+                // Check electives
+                let electivesRequirementMet = false;
                 if (requirements.electives[0].startsWith("Any three from:")) {
                     const allowedElectives = requirements.electives[0].split(":")[1].split(",").map(e => e.trim());
-                    return selectedElectives.filter(e => allowedElectives.includes(e)).length >= 3;
+                    electivesRequirementMet = Object.keys(electiveGrades).filter(e => allowedElectives.includes(e)).length >= 3;
+                } else if (requirements.electives[0] === "Any three from General Science, General Arts, or Business electives") {
+                    electivesRequirementMet = Object.keys(electiveGrades).length >= 3;
+                } else {
+                    electivesRequirementMet = requirements.electives.every(elective => {
+                        if (elective.includes(" or ")) {
+                            return elective.split(" or ").some(e => electiveGrades[e] && isPassingGrade(electiveGrades[e]));
+                        }
+                        return electiveGrades[elective] && isPassingGrade(electiveGrades[elective]);
+                    });
                 }
 
-                const requiredElectives = requirements.electives.flatMap(e => e.split(" or "));
-                const hasRequiredElectives = requiredElectives.every(e => {
-                    if (e.startsWith("Any two from:")) {
-                        const allowedElectives = e.split(":")[1].split(",").map(e => e.trim());
-                        return selectedElectives.filter(se => allowedElectives.includes(se)).length >= 2;
-                    }
-                    return selectedElectives.includes(e) || e === "Any one or two from the program";
-                });
-
-                return hasRequiredElectives;
+                return electivesRequirementMet;
             }).map(([course]) => course);
 
             displayEligibilityResults(eligibleCourses);
         }
 
+        function isPassingGrade(grade) {
+            // Implement your grade validation logic here
+            // For example, consider A1-C6 as passing grades
+            const passingGrades = ['A1', 'B2', 'B3', 'C4', 'C5', 'C6'];
+            return passingGrades.includes(grade.toUpperCase());
+        }
+
         function displayEligibilityResults(eligibleCourses) {
             messageContainer.classList.remove('hidden');
             if (eligibleCourses.length === 0) {
-                message.textContent = "Based on your selections, you are not eligible for any courses. Please review the entry requirements and try again.";
+                message.textContent = "Based on your selections and grades, you are not eligible for any courses. Please review the entry requirements and try again.";
                 eligibleCoursesList.innerHTML = '';
             } else {
                 message.textContent = "You are eligible for the following courses:";
@@ -232,9 +369,11 @@
             selectedCourseTitle.textContent = course;
             const requirements = courseRequirements[course];
             courseRequirementsText.innerHTML = `
+                <strong>Faculty:</strong> ${requirements.faculty}<br>
                 <strong>Core Subjects:</strong> ${requirements.core.join(", ")}<br>
                 <strong>Elective Subjects:</strong> ${requirements.electives.join(", ")}<br>
-                <strong>Program:</strong> ${requirements.program}
+                <strong>Program:</strong> ${requirements.program === "Any" ? "General Science, General Arts, or Business" : requirements.program}
+                ${requirements.note ? `<br><strong>Note:</strong> ${requirements.note}` : ''}
             `;
             courseDetailsCard.classList.remove('hidden');
         }
@@ -244,6 +383,11 @@
             courseDetailsCard.classList.add('hidden');
             checkEligibilityBtn.disabled = true;
         }
+
+        // Initialize core subject input listeners
+        document.querySelectorAll('#coreSubjects input').forEach(input => {
+            input.addEventListener('input', updateCheckEligibilityButton);
+        });
     </script>
 </body>
 </html>
