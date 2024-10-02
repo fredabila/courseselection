@@ -24,7 +24,7 @@
                 </div>
 
                 <div id="electivesContainer" class="hidden">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Select 3 electives:</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Select your electives:</label>
                     <div id="electivesList" class="space-y-2"></div>
                 </div>
 
@@ -37,10 +37,9 @@
             </div>
         </div>
 
-        <div id="careerPathsCard" class="bg-white shadow-xl rounded-lg p-6 hidden">
+        <div id="courseDetailsCard" class="bg-white shadow-xl rounded-lg p-6 hidden">
             <h2 id="selectedCourseTitle" class="text-xl font-bold text-gray-900 mb-2"></h2>
-            <p class="text-gray-600 mb-4">Career Paths</p>
-            <ul id="careerPathsList" class="list-disc list-inside space-y-2"></ul>
+            <p id="courseRequirements" class="text-gray-600 mb-4"></p>
         </div>
     </div>
 
@@ -48,8 +47,8 @@
         const programs = ["General Science", "General Arts", "Business"];
 
         const electives = {
-            "General Science": ["Physics", "Chemistry", "Biology", "Elective Mathematics", "Geography", "Applied Electricity", "Technical Drawing", "Metal Work", "ICT"],
-            "General Arts": ["Economics", "Geography", "Elective Mathematics", "ICT", "History", "Government", "Literature in English"],
+            "General Science": ["Physics", "Chemistry", "Elective Mathematics", "Biology", "Geography", "Applied Electricity", "Technical Drawing", "Metal Work"],
+            "General Arts": ["Economics", "Geography", "Elective Mathematics", "ICT", "History", "Government"],
             "Business": ["Accounting", "Business Management", "Economics", "Costing", "ICT", "Elective Mathematics"]
         };
 
@@ -57,74 +56,72 @@
             "BSc Mining Engineering": {
                 core: ["English Language", "Mathematics", "Integrated Science"],
                 electives: ["Physics", "Chemistry", "Elective Mathematics"],
-                program: "General Science",
-                careerPaths: [
-                    "Mining Engineer",
-                    "Mineral Processing Engineer",
-                    "Environmental Engineer in Mining",
-                    "Mine Safety Manager",
-                    "Geotechnical Engineer"
-                ]
+                program: "General Science"
+            },
+            "BSc Minerals Engineering": {
+                core: ["English Language", "Mathematics", "Integrated Science"],
+                electives: ["Physics", "Chemistry", "Elective Mathematics"],
+                program: "General Science"
             },
             "BSc Geomatic Engineering": {
                 core: ["English Language", "Mathematics", "Integrated Science"],
                 electives: ["Physics", "Elective Mathematics", "Chemistry or Geography"],
-                program: "General Science",
-                careerPaths: [
-                    "Surveyor",
-                    "GIS Specialist",
-                    "Remote Sensing Analyst",
-                    "Cartographer",
-                    "Land Information Manager"
-                ]
+                program: "General Science"
+            },
+            "BSc Geological Engineering": {
+                core: ["English Language", "Mathematics", "Integrated Science"],
+                electives: ["Physics", "Chemistry", "Elective Mathematics"],
+                program: "General Science"
+            },
+            "BSc Environmental and Safety Engineering": {
+                core: ["English Language", "Mathematics", "Integrated Science"],
+                electives: ["Physics", "Chemistry", "Elective Mathematics"],
+                program: "General Science"
             },
             "BSc Land Administration and Information Systems": {
                 core: ["English Language", "Mathematics", "Integrated Science"],
-                electives: ["Economics", "Geography", "Elective Mathematics", "ICT", "History", "Government"],
-                program: "General Arts",
-                careerPaths: [
-                    "Land Administrator",
-                    "Real Estate Manager",
-                    "Urban Planner",
-                    "Land Information Systems Specialist",
-                    "Property Valuer"
-                ]
+                electives: ["Any three from: Economics, Geography, Elective Mathematics, ICT, History, Government"],
+                program: "General Arts"
+            },
+            "BSc Spatial Planning": {
+                core: ["English Language", "Mathematics", "Integrated Science"],
+                electives: ["Any three from: Economics, Geography, Elective Mathematics, ICT, History, Government"],
+                program: "General Arts"
             },
             "BSc Computer Science and Engineering": {
                 core: ["English Language", "Mathematics", "Integrated Science"],
                 electives: ["Elective Mathematics", "Physics", "Chemistry or ICT or Applied Electricity"],
-                program: "General Science",
-                careerPaths: [
-                    "Software Engineer",
-                    "Data Scientist",
-                    "Network Engineer",
-                    "Cybersecurity Specialist",
-                    "Artificial Intelligence Engineer"
-                ]
+                program: "General Science"
+            },
+            "BSc Mathematics": {
+                core: ["English Language", "Mathematics", "Integrated Science"],
+                electives: ["Elective Mathematics", "Any two from: Physics, Chemistry, Biology, Applied Electricity, Technical Drawing, ICT, Metal Work, Economics, Geography, Accounting, Business Management, Costing"],
+                program: "Any"
+            },
+            "BSc Statistical Data Science": {
+                core: ["English Language", "Mathematics", "Integrated Science"],
+                electives: ["Elective Mathematics", "Any two from: Physics, Chemistry, Biology, Applied Electricity, Technical Drawing, ICT, Metal Work, Economics, Geography, Accounting, Business Management, Costing"],
+                program: "Any"
+            },
+            "BSc Cyber Security": {
+                core: ["English Language", "Mathematics", "Integrated Science"],
+                electives: ["Any three from: Physics, Chemistry, Biology, Geography, ICT, Elective Mathematics, Economics, Accounting, Business Management, Costing"],
+                program: "Any"
+            },
+            "BSc Information Systems and Technology": {
+                core: ["English Language", "Mathematics", "Integrated Science"],
+                electives: ["Any three from: Physics, Chemistry, Biology, Geography, ICT, Elective Mathematics, Economics, Accounting, Business Management, Costing"],
+                program: "Any"
             },
             "BSc Logistics and Transport Management": {
                 core: ["English Language", "Mathematics", "Integrated Science or Social Studies"],
                 electives: ["Any three from the program"],
-                program: "Any",
-                careerPaths: [
-                    "Logistics Manager",
-                    "Supply Chain Analyst",
-                    "Transportation Planner",
-                    "Warehouse Operations Manager",
-                    "Freight Forwarding Specialist"
-                ]
+                program: "Any"
             },
             "BSc Economics and Industrial Organization": {
                 core: ["English Language", "Mathematics", "Integrated Science or Social Studies"],
                 electives: ["Economics and/or Elective Mathematics", "Any one or two from the program"],
-                program: "Any",
-                careerPaths: [
-                    "Economic Analyst",
-                    "Industrial Economist",
-                    "Market Research Analyst",
-                    "Policy Advisor",
-                    "Business Consultant"
-                ]
+                program: "Any"
             }
         };
 
@@ -135,9 +132,9 @@
         const messageContainer = document.getElementById('messageContainer');
         const message = document.getElementById('message');
         const eligibleCoursesList = document.getElementById('eligibleCoursesList');
-        const careerPathsCard = document.getElementById('careerPathsCard');
+        const courseDetailsCard = document.getElementById('courseDetailsCard');
         const selectedCourseTitle = document.getElementById('selectedCourseTitle');
-        const careerPathsList = document.getElementById('careerPathsList');
+        const courseRequirementsText = document.getElementById('courseRequirements');
 
         let selectedElectives = [];
 
@@ -166,12 +163,10 @@
 
                 const checkbox = div.querySelector('input');
                 checkbox.addEventListener('change', function() {
-                    if (this.checked && selectedElectives.length < 3) {
+                    if (this.checked) {
                         selectedElectives.push(elective);
-                    } else if (!this.checked) {
-                        selectedElectives = selectedElectives.filter(e => e !== elective);
                     } else {
-                        this.checked = false;
+                        selectedElectives = selectedElectives.filter(e => e !== elective);
                     }
                     updateCheckEligibilityButton();
                 });
@@ -179,7 +174,7 @@
         }
 
         function updateCheckEligibilityButton() {
-            checkEligibilityBtn.disabled = !(programSelect.value && selectedElectives.length === 3);
+            checkEligibilityBtn.disabled = !(programSelect.value && selectedElectives.length > 0);
         }
 
         checkEligibilityBtn.addEventListener('click', checkEligibility);
@@ -191,12 +186,23 @@
                     return false;
                 }
                 
+                if (requirements.electives[0] === "Any three from the program") {
+                    return selectedElectives.length >= 3;
+                }
+
+                if (requirements.electives[0].startsWith("Any three from:")) {
+                    const allowedElectives = requirements.electives[0].split(":")[1].split(",").map(e => e.trim());
+                    return selectedElectives.filter(e => allowedElectives.includes(e)).length >= 3;
+                }
+
                 const requiredElectives = requirements.electives.flatMap(e => e.split(" or "));
-                const hasRequiredElectives = requiredElectives.every(e => 
-                    e === "Any three from the program" || 
-                    selectedElectives.includes(e) || 
-                    (e === "Any one or two from the program" && selectedElectives.some(se => electives[selectedProgram].includes(se)))
-                );
+                const hasRequiredElectives = requiredElectives.every(e => {
+                    if (e.startsWith("Any two from:")) {
+                        const allowedElectives = e.split(":")[1].split(",").map(e => e.trim());
+                        return selectedElectives.filter(se => allowedElectives.includes(se)).length >= 2;
+                    }
+                    return selectedElectives.includes(e) || e === "Any one or two from the program";
+                });
 
                 return hasRequiredElectives;
             }).map(([course]) => course);
@@ -213,26 +219,29 @@
                 message.textContent = "You are eligible for the following courses:";
                 eligibleCoursesList.innerHTML = eligibleCourses.map(course => `
                     <li>
-                        <button class="w-full text-left p-2 bg-gray-100 hover:bg-gray-200 rounded" onclick="showCareerPaths('${course}')">
+                        <button class="w-full text-left p-2 bg-gray-100 hover:bg-gray-200 rounded" onclick="showCourseDetails('${course}')">
                             ${course}
                         </button>
                     </li>
                 `).join('');
             }
-            careerPathsCard.classList.add('hidden');
+            courseDetailsCard.classList.add('hidden');
         }
 
-        function showCareerPaths(course) {
+        function showCourseDetails(course) {
             selectedCourseTitle.textContent = course;
-            careerPathsList.innerHTML = courseRequirements[course].careerPaths.map(career => `
-                <li class="text-gray-700">${career}</li>
-            `).join('');
-            careerPathsCard.classList.remove('hidden');
+            const requirements = courseRequirements[course];
+            courseRequirementsText.innerHTML = `
+                <strong>Core Subjects:</strong> ${requirements.core.join(", ")}<br>
+                <strong>Elective Subjects:</strong> ${requirements.electives.join(", ")}<br>
+                <strong>Program:</strong> ${requirements.program}
+            `;
+            courseDetailsCard.classList.remove('hidden');
         }
 
         function resetEligibility() {
             messageContainer.classList.add('hidden');
-            careerPathsCard.classList.add('hidden');
+            courseDetailsCard.classList.add('hidden');
             checkEligibilityBtn.disabled = true;
         }
     </script>
