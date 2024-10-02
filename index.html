@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Eligibility Checker - University of Mines and Technology</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-2xl mx-auto space-y-8">
+        <div class="bg-white shadow-xl rounded-lg p-6">
+            <h1 class="text-2xl font-bold text-center text-gray-900 mb-2">Course Eligibility Checker</h1>
+            <p class="text-center text-gray-600 mb-6">University of Mines and Technology</p>
+            
+            <div class="space-y-6">
+                <div>
+                    <label for="program" class="block text-sm font-medium text-gray-700 mb-1">Select your program:</label>
+                    <select id="program" class="w-full p-2 border border-gray-300 rounded-md">
+                        <option value="">Choose a program</option>
+                        <option value="General Science">General Science</option>
+                        <option value="General Arts">General Arts</option>
+                        <option value="Business">Business</option>
+                    </select>
+                </div>
+
+                <div id="electivesContainer" class="hidden">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Select 3 electives:</label>
+                    <div id="electivesList" class="space-y-2"></div>
+                </div>
+
+                <button id="checkEligibility" class="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 disabled:bg-gray-400" disabled>Check Eligibility</button>
+
+                <div id="messageContainer" class="mt-4 hidden">
+                    <p id="message" class="text-sm text-gray-700"></p>
+                    <ul id="eligibleCoursesList" class="mt-2 space-y-2"></ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="careerPathsCard" class="bg-white shadow-xl rounded-lg p-6 hidden">
+            <h2 id="selectedCourseTitle" class="text-xl font-bold text-gray-900 mb-2"></h2>
+            <p class="text-gray-600 mb-4">Career Paths</p>
+            <ul id="careerPathsList" class="list-disc list-inside space-y-2"></ul>
+        </div>
+    </div>
+
+    <script>
+        const programs = ["General Science", "General Arts", "Business"];
+
+        const electives = {
+            "General Science": ["Physics", "Chemistry", "Biology", "Elective Mathematics", "Geography", "Applied Electricity", "Technical Drawing", "Metal Work", "ICT"],
+            "General Arts": ["Economics", "Geography", "Elective Mathematics", "ICT", "History", "Government", "Literature in English"],
+            "Business": ["Accounting", "Business Management", "Economics", "Costing", "ICT", "Elective Mathematics"]
+        };
+
+        const courseRequirements = {
+            "BSc Mining Engineering": {
+                core: ["English Language", "Mathematics", "Integrated Science"],
+                electives: ["Physics", "Chemistry", "Elective Mathematics"],
+                program: "General Science",
+                careerPaths: [
+                    "Mining Engineer",
+                    "Mineral Processing Engineer",
+                    "Environmental Engineer in Mining",
+                    "Mine Safety Manager",
+                    "Geotechnical Engineer"
+                ]
+            },
+            "BSc Geomatic Engineering": {
+                core: ["English Language", "Mathematics", "Integrated Science"],
+                electives: ["Physics", "Elective Mathematics", "Chemistry or Geography"],
+                program: "General Science",
+                careerPaths: [
+                    "Surveyor",
+                    "GIS Specialist",
+                    "Remote Sensing Analyst",
+                    "Cartographer",
+                    "Land Information Manager"
+                ]
+            },
+            "BSc Land Administration and Information Systems": {
+                core: ["English Language", "Mathematics", "Integrated Science"],
+                electives: ["Economics", "Geography", "Elective Mathematics", "ICT", "History", "Government"],
+                program: "General Arts",
+                careerPaths: [
+                    "Land Administrator",
+                    "Real Estate Manager",
+                    "Urban Planner",
+                    "Land Information Systems Specialist",
+                    "Property Valuer"
+                ]
+            },
+            "BSc Computer Science and Engineering": {
+                core: ["English Language", "Mathematics", "Integrated Science"],
+                electives: ["Elective Mathematics", "Physics", "Chemistry or ICT or Applied Electricity"],
+                program: "General Science",
+                careerPaths: [
+                    "Software Engineer",
+                    "Data Scientist",
+                    "Network Engineer",
+                    "Cybersecurity Specialist",
+                    "Artificial Intelligence Engineer"
+                ]
+            },
+            "BSc Logistics and Transport Management": {
+                core: ["English Language", "Mathematics", "Integrated Science or Social Studies"],
+                electives: ["Any three from the program"],
+                program: "Any",
+                careerPaths: [
+                    "Logistics Manager",
+                    "Supply Chain Analyst",
+                    "Transportation Planner",
+                    "Warehouse Operations Manager",
+                    "Freight Forwarding Specialist"
+                ]
+            },
+            "BSc Economics and Industrial Organization": {
+                core: ["English Language", "Mathematics", "Integrated Science or Social Studies"],
+                electives: ["Economics and/or Elective Mathematics", "Any one or two from the program"],
+                program: "Any",
+                careerPaths: [
+                    "Economic Analyst",
+                    "Industrial Economist",
+                    "Market Research Analyst",
+                    "Policy Advisor",
+                    "Business Consultant"
+                ]
+            }
+        };
+
+        const programSelect = document.getElementById('program');
+        const electivesContainer = document.getElementById('electivesContainer');
+        const electivesList = document.getElementById('electivesList');
+        const checkEligibilityBtn = document.getElementById('checkEligibility');
+        const messageContainer = document.getElementById('messageContainer');
+        const message = document.getElementById('message');
+        const eligibleCoursesList = document.getElementById('eligibleCoursesList');
+        const careerPathsCard = document.getElementById('careerPathsCard');
+        const selectedCourseTitle = document.getElementById('selectedCourseTitle');
+        const careerPathsList = document.getElementById('careerPathsList');
+
+        let selectedElectives = [];
+
+        programSelect.addEventListener('change', function() {
+            const selectedProgram = this.value;
+            if (selectedProgram) {
+                electivesContainer.classList.remove('hidden');
+                populateElectives(selectedProgram);
+            } else {
+                electivesContainer.classList.add('hidden');
+            }
+            resetEligibility();
+        });
+
+        function populateElectives(program) {
+            electivesList.innerHTML = '';
+            selectedElectives = [];
+            electives[program].forEach(elective => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center';
+                div.innerHTML = `
+                    <input type="checkbox" id="${elective}" class="mr-2">
+                    <label for="${elective}" class="text-sm text-gray-700">${elective}</label>
+                `;
+                electivesList.appendChild(div);
+
+                const checkbox = div.querySelector('input');
+                checkbox.addEventListener('change', function() {
+                    if (this.checked && selectedElectives.length < 3) {
+                        selectedElectives.push(elective);
+                    } else if (!this.checked) {
+                        selectedElectives = selectedElectives.filter(e => e !== elective);
+                    } else {
+                        this.checked = false;
+                    }
+                    updateCheckEligibilityButton();
+                });
+            });
+        }
+
+        function updateCheckEligibilityButton() {
+            checkEligibilityBtn.disabled = !(programSelect.value && selectedElectives.length === 3);
+        }
+
+        checkEligibilityBtn.addEventListener('click', checkEligibility);
+
+        function checkEligibility() {
+            const selectedProgram = programSelect.value;
+            const eligibleCourses = Object.entries(courseRequirements).filter(([course, requirements]) => {
+                if (requirements.program !== "Any" && requirements.program !== selectedProgram) {
+                    return false;
+                }
+                
+                const requiredElectives = requirements.electives.flatMap(e => e.split(" or "));
+                const hasRequiredElectives = requiredElectives.every(e => 
+                    e === "Any three from the program" || 
+                    selectedElectives.includes(e) || 
+                    (e === "Any one or two from the program" && selectedElectives.some(se => electives[selectedProgram].includes(se)))
+                );
+
+                return hasRequiredElectives;
+            }).map(([course]) => course);
+
+            displayEligibilityResults(eligibleCourses);
+        }
+
+        function displayEligibilityResults(eligibleCourses) {
+            messageContainer.classList.remove('hidden');
+            if (eligibleCourses.length === 0) {
+                message.textContent = "Based on your selections, you are not eligible for any courses. Please review the entry requirements and try again.";
+                eligibleCoursesList.innerHTML = '';
+            } else {
+                message.textContent = "You are eligible for the following courses:";
+                eligibleCoursesList.innerHTML = eligibleCourses.map(course => `
+                    <li>
+                        <button class="w-full text-left p-2 bg-gray-100 hover:bg-gray-200 rounded" onclick="showCareerPaths('${course}')">
+                            ${course}
+                        </button>
+                    </li>
+                `).join('');
+            }
+            careerPathsCard.classList.add('hidden');
+        }
+
+        function showCareerPaths(course) {
+            selectedCourseTitle.textContent = course;
+            careerPathsList.innerHTML = courseRequirements[course].careerPaths.map(career => `
+                <li class="text-gray-700">${career}</li>
+            `).join('');
+            careerPathsCard.classList.remove('hidden');
+        }
+
+        function resetEligibility() {
+            messageContainer.classList.add('hidden');
+            careerPathsCard.classList.add('hidden');
+            checkEligibilityBtn.disabled = true;
+        }
+    </script>
+</body>
+</html>
