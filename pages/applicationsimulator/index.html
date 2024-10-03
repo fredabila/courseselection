@@ -75,6 +75,12 @@
           Application Results
         </h2>
         <p id="resultMessage" class="text-lg text-gray-700"></p>
+        <div id="explanationMessage" class="mt-4 text-sm text-gray-600"></div>
+      </div>
+
+      <div id="allApplicants" class="bg-white shadow-xl rounded-lg p-6">
+        <h2 class="text-xl font-bold text-gray-900 mb-4">All Applicants</h2>
+        <ul id="applicantList" class="list-disc pl-5"></ul>
       </div>
     </div>
 
@@ -125,75 +131,94 @@
         ],
       };
 
-      // Define courses and their competitiveness (1-10, 10 being most competitive)
+      // Define courses with their required electives
       const courses = {
         "BSc Mining Engineering": {
-          competitiveness: 9,
-          program: "General Science",
-        },
-        "BSc Petroleum Engineering": {
-          competitiveness: 10,
-          program: "General Science",
-        },
-        "BSc Computer Science and Engineering": {
-          competitiveness: 8,
-          program: "General Science",
-        },
-        "BSc Electrical and Electronic Engineering": {
-          competitiveness: 8,
-          program: "General Science",
-        },
-        "BSc Renewable Energy Engineering": {
-          competitiveness: 7,
-          program: "General Science",
-        },
-        "BSc Mathematics": { competitiveness: 6, program: "Any" },
-        "BSc Geomatic Engineering": {
-          competitiveness: 7,
-          program: "General Science",
-        },
-        "BSc Environmental and Safety Engineering": {
-          competitiveness: 6,
-          program: "General Science",
-        },
-        "BSc Mechanical Engineering": {
-          competitiveness: 8,
-          program: "General Science",
-        },
-        "BSc Geological Engineering": {
-          competitiveness: 7,
+          electives: ["Physics", "Chemistry", "Elective Mathematics"],
           program: "General Science",
         },
         "BSc Minerals Engineering": {
-          competitiveness: 7,
+          electives: ["Physics", "Chemistry", "Elective Mathematics"],
           program: "General Science",
         },
-        "BSc Chemical Engineering": {
-          competitiveness: 8,
+        "BSc Geomatic Engineering": {
+          electives: ["Physics", "Chemistry", "Elective Mathematics"],
           program: "General Science",
         },
-        "BSc Petroleum Geosciences Engineering": {
-          competitiveness: 8,
+        "BSc Geological Engineering": {
+          electives: ["Physics", "Chemistry", "Elective Mathematics"],
+          program: "General Science",
+        },
+        "BSc Environmental and Safety Engineering": {
+          electives: ["Physics", "Chemistry", "Elective Mathematics"],
           program: "General Science",
         },
         "BSc Land Administration and Information Systems": {
-          competitiveness: 5,
+          electives: ["Economics", "Geography", "Elective Mathematics"],
+          program: "Any",
+        },
+        "BSc Spatial Planning": {
+          electives: ["Economics", "Geography", "Elective Mathematics"],
+          program: "Any",
+        },
+        "BSc Petroleum Engineering": {
+          electives: ["Physics", "Chemistry", "Elective Mathematics"],
+          program: "General Science",
+        },
+        "BSc Natural Gas Engineering": {
+          electives: ["Physics", "Chemistry", "Elective Mathematics"],
+          program: "General Science",
+        },
+        "BSc Petroleum Geosciences and Engineering": {
+          electives: ["Physics", "Chemistry", "Elective Mathematics"],
+          program: "General Science",
+        },
+        "BSc Petroleum Refining and Petrochemical Engineering": {
+          electives: ["Physics", "Chemistry", "Elective Mathematics"],
+          program: "General Science",
+        },
+        "BSc Chemical Engineering": {
+          electives: ["Physics", "Chemistry", "Elective Mathematics"],
+          program: "General Science",
+        },
+        "BSc Mechanical Engineering": {
+          electives: ["Physics", "Chemistry", "Elective Mathematics"],
+          program: "General Science",
+        },
+        "BSc Electrical and Electronic Engineering": {
+          electives: ["Physics", "Chemistry", "Elective Mathematics"],
+          program: "General Science",
+        },
+        "BSc Renewable Energy Engineering": {
+          electives: ["Physics", "Chemistry", "Elective Mathematics"],
+          program: "General Science",
+        },
+        "BSc Computer Science and Engineering": {
+          electives: ["Physics", "Chemistry", "Elective Mathematics"],
+          program: "General Science",
+        },
+        "BSc Mathematics": {
+          electives: ["Physics", "Chemistry", "Elective Mathematics"],
+          program: "Any",
+        },
+        "BSc Statistical Data Science": {
+          electives: ["Physics", "Chemistry", "Elective Mathematics"],
+          program: "Any",
+        },
+        "BSc Cyber Security": {
+          electives: ["Physics", "Chemistry", "Elective Mathematics"],
+          program: "Any",
+        },
+        "BSc Information Systems and Technology": {
+          electives: ["Physics", "Chemistry", "Elective Mathematics"],
+          program: "Any",
+        },
+        "BSc Logistics and Transport Management": {
+          electives: ["Economics", "Accounting", "Business Management"],
           program: "Any",
         },
         "BSc Economics and Industrial Organization": {
-          competitiveness: 6,
-          program: "Any",
-        },
-        "BSc Accounting with Computing": {
-          competitiveness: 7,
-          program: "Business",
-        },
-        "BSc Business Administration": {
-          competitiveness: 6,
-          program: "Business",
-        },
-        "BSc Logistics and Transport Management": {
-          competitiveness: 5,
+          electives: ["Economics", "Accounting", "Business Management"],
           program: "Any",
         },
       };
@@ -205,6 +230,8 @@
       const courseChoices = document.getElementById("courseChoices");
       const results = document.getElementById("results");
       const resultMessage = document.getElementById("resultMessage");
+      const explanationMessage = document.getElementById("explanationMessage");
+      const applicantList = document.getElementById("applicantList");
 
       // Populate grade inputs when program is selected
       programSelect.addEventListener("change", () => {
@@ -280,6 +307,10 @@
           applicantData.grades[subject] = formData.get(subject);
         });
 
+        // Calculate aggregate
+        const aggregate = calculateAggregate(applicantData);
+        applicantData.aggregate = aggregate;
+
         // Save applicant data to Firestore
         try {
           await db.collection("applicants").add(applicantData);
@@ -289,20 +320,29 @@
         }
 
         // Simulate selection process
-        const selectedCourse = simulateSelection(applicantData);
+        const selectionResult = await simulateSelection(applicantData);
 
         // Display results
         results.classList.remove("hidden");
-        if (selectedCourse) {
-          resultMessage.textContent = `Congratulations! You have been selected for ${selectedCourse}.`;
+        if (selectionResult.selected) {
+          resultMessage.textContent = `Congratulations! You have been selected for ${selectionResult.course} (${selectionResult.type}).`;
         } else {
           resultMessage.textContent =
             "Unfortunately, you were not selected for any of your chosen courses.";
         }
+        explanationMessage.textContent = selectionResult.explanation;
+
+        // Refresh the applicant list
+        loadApplicants();
       });
 
-      // Simulate selection process
-      function simulateSelection(applicantData) {
+      // Calculate aggregate
+      function calculateAggregate(applicantData) {
+        const coreSubjects = [
+          "English Language",
+          "Mathematics",
+          "Integrated Science",
+        ];
         const gradePoints = {
           A1: 1,
           B2: 2,
@@ -315,33 +355,95 @@
           F9: 9,
         };
 
-        // Calculate average grade point
-        const totalPoints = Object.values(applicantData.grades).reduce(
-          (sum, grade) => sum + gradePoints[grade],
+        let totalPoints = coreSubjects.reduce(
+          (sum, subject) => sum + gradePoints[applicantData.grades[subject]],
           0
         );
-        const avgGradePoint =
-          totalPoints / Object.keys(applicantData.grades).length;
 
-        // Adjust score based on program competitiveness
-        const adjustedScores = applicantData.choices.map((course) => {
-          const courseInfo = courses[course];
-          if (!courseInfo) return 0;
-          const competitivenessAdjustment =
-            (11 - courseInfo.competitiveness) / 10;
-          return (10 - avgGradePoint) * competitivenessAdjustment;
-        });
-
-        // Find the highest adjusted score above a threshold (e.g., 5)
-        const threshold = 5;
-        const selectedCourseIndex = adjustedScores.findIndex(
-          (score) => score > threshold
+        // Find the best 3 elective subjects
+        const electiveSubjects = Object.keys(applicantData.grades).filter(
+          (subject) => !coreSubjects.includes(subject)
         );
+        const electivePoints = electiveSubjects
+          .map((subject) => gradePoints[applicantData.grades[subject]])
+          .sort((a, b) => a - b)
+          .slice(0, 3);
 
-        return selectedCourseIndex !== -1
-          ? applicantData.choices[selectedCourseIndex]
-          : null;
+        totalPoints += electivePoints.reduce((sum, points) => sum + points, 0);
+
+        return totalPoints;
       }
+
+      // Simulate selection process
+      async function simulateSelection(applicantData) {
+        const allApplicants = await db.collection("applicants").get();
+        const applicantsData = allApplicants.docs.map((doc) => doc.data());
+
+        for (const course of applicantData.choices) {
+          const courseInfo = courses[course];
+          const courseApplicants = applicantsData.filter((app) =>
+            app.choices.includes(course)
+          );
+          const cutoffAggregate = calculateCutoffAggregate(courseApplicants);
+
+          if (applicantData.aggregate <= cutoffAggregate) {
+            // Check if the applicant has the required electives
+            const hasRequiredElectives = courseInfo.electives.every(
+              (elective) =>
+                applicantData.grades[elective] &&
+                ["A1", "B2", "B3", "C4", "C5", "C6"].includes(
+                  applicantData.grades[elective]
+                )
+            );
+
+            if (hasRequiredElectives) {
+              const type =
+                applicantData.aggregate <= 36 ? "Regular" : "Fee-paying";
+              return {
+                selected: true,
+                course: course,
+                type: type,
+                explanation: `Your aggregate of ${applicantData.aggregate} meets the cutoff of ${cutoffAggregate} for ${course}. You have been selected for ${type} admission.`,
+              };
+            } else {
+              return {
+                selected: false,
+                explanation: `Your aggregate of ${applicantData.aggregate} meets the cutoff of ${cutoffAggregate} for ${course}, but you don't have the required elective subjects or grades.`,
+              };
+            }
+          }
+        }
+
+        return {
+          selected: false,
+          explanation: `Your aggregate of ${applicantData.aggregate} does not meet the cutoff for any of your chosen courses.`,
+        };
+      }
+
+      // Calculate cutoff aggregate for a course
+      function calculateCutoffAggregate(applicants) {
+        if (applicants.length === 0) return 36; // Default cutoff if no applicants
+        const sortedAggregates = applicants
+          .map((app) => app.aggregate)
+          .sort((a, b) => a - b);
+        const cutoffIndex = Math.floor(applicants.length * 0.7); // Top 70% of applicants
+        return sortedAggregates[cutoffIndex] || 36;
+      }
+
+      // Load and display all applicants
+      async function loadApplicants() {
+        const allApplicants = await db.collection("applicants").get();
+        applicantList.innerHTML = "";
+        allApplicants.forEach((doc) => {
+          const data = doc.data();
+          const li = document.createElement("li");
+          li.textContent = `${data.name}: ${data.program} - Aggregate: ${data.aggregate}`;
+          applicantList.appendChild(li);
+        });
+      }
+
+      // Initial load of applicants
+      loadApplicants();
     </script>
   </body>
 </html>
