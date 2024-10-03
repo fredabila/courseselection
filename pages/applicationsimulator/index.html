@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>UMaT Application Simulator</title>
+    <title>UMaT Application System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
@@ -12,7 +12,7 @@
     <div class="max-w-4xl mx-auto space-y-8">
       <div class="bg-white shadow-xl rounded-lg p-6">
         <h1 class="text-2xl font-bold text-center text-gray-900 mb-2">
-          UMaT Application Simulator
+          UMaT Application System
         </h1>
         <p class="text-center text-gray-600 mb-6">
           University of Mines and Technology
@@ -51,14 +51,12 @@
 
           <div id="gradeInputs" class="space-y-4">
             <h2 class="text-lg font-semibold">Enter your grades</h2>
-            <!-- Grade inputs will be dynamically added here -->
           </div>
 
           <div id="courseChoices" class="space-y-4">
             <h2 class="text-lg font-semibold">
               Select your course choices (in order of preference)
             </h2>
-            <!-- Course choice selects will be dynamically added here -->
           </div>
 
           <button
@@ -85,22 +83,17 @@
     </div>
 
     <script>
-      // Firebase configuration
       const firebaseConfig = {
-        apiKey: "AIzaSyBacLqR9vocAWwV2o_KohKDA1v2noG82SI",
-        authDomain: "buzz-chat-17759.firebaseapp.com",
-        projectId: "buzz-chat-17759",
-        storageBucket: "buzz-chat-17759.appspot.com",
-        messagingSenderId: "996339174890",
-        appId: "1:996339174890:web:1ef3be0931143f91823693",
-        measurementId: "G-3V7YT7YPB6",
+        apiKey: "YOUR_API_KEY",
+        authDomain: "YOUR_AUTH_DOMAIN",
+        projectId: "YOUR_PROJECT_ID",
+        storageBucket: "YOUR_STORAGE_BUCKET",
+        messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+        appId: "YOUR_APP_ID",
       };
-
-      // Initialize Firebase
       firebase.initializeApp(firebaseConfig);
       const db = firebase.firestore();
 
-      // Define subjects for each program
       const subjects = {
         "General Science": [
           "English Language",
@@ -109,7 +102,6 @@
           "Physics",
           "Chemistry",
           "Elective Mathematics",
-          "Biology",
         ],
         "General Arts": [
           "English Language",
@@ -131,99 +123,25 @@
         ],
       };
 
-      // Define courses with their required electives
       const courses = {
         "BSc Mining Engineering": {
           electives: ["Physics", "Chemistry", "Elective Mathematics"],
           program: "General Science",
+          cutoff: 15,
         },
         "BSc Minerals Engineering": {
           electives: ["Physics", "Chemistry", "Elective Mathematics"],
           program: "General Science",
+          cutoff: 16,
         },
         "BSc Geomatic Engineering": {
           electives: ["Physics", "Chemistry", "Elective Mathematics"],
           program: "General Science",
+          cutoff: 17,
         },
-        "BSc Geological Engineering": {
-          electives: ["Physics", "Chemistry", "Elective Mathematics"],
-          program: "General Science",
-        },
-        "BSc Environmental and Safety Engineering": {
-          electives: ["Physics", "Chemistry", "Elective Mathematics"],
-          program: "General Science",
-        },
-        "BSc Land Administration and Information Systems": {
-          electives: ["Economics", "Geography", "Elective Mathematics"],
-          program: "Any",
-        },
-        "BSc Spatial Planning": {
-          electives: ["Economics", "Geography", "Elective Mathematics"],
-          program: "Any",
-        },
-        "BSc Petroleum Engineering": {
-          electives: ["Physics", "Chemistry", "Elective Mathematics"],
-          program: "General Science",
-        },
-        "BSc Natural Gas Engineering": {
-          electives: ["Physics", "Chemistry", "Elective Mathematics"],
-          program: "General Science",
-        },
-        "BSc Petroleum Geosciences and Engineering": {
-          electives: ["Physics", "Chemistry", "Elective Mathematics"],
-          program: "General Science",
-        },
-        "BSc Petroleum Refining and Petrochemical Engineering": {
-          electives: ["Physics", "Chemistry", "Elective Mathematics"],
-          program: "General Science",
-        },
-        "BSc Chemical Engineering": {
-          electives: ["Physics", "Chemistry", "Elective Mathematics"],
-          program: "General Science",
-        },
-        "BSc Mechanical Engineering": {
-          electives: ["Physics", "Chemistry", "Elective Mathematics"],
-          program: "General Science",
-        },
-        "BSc Electrical and Electronic Engineering": {
-          electives: ["Physics", "Chemistry", "Elective Mathematics"],
-          program: "General Science",
-        },
-        "BSc Renewable Energy Engineering": {
-          electives: ["Physics", "Chemistry", "Elective Mathematics"],
-          program: "General Science",
-        },
-        "BSc Computer Science and Engineering": {
-          electives: ["Physics", "Chemistry", "Elective Mathematics"],
-          program: "General Science",
-        },
-        "BSc Mathematics": {
-          electives: ["Physics", "Chemistry", "Elective Mathematics"],
-          program: "Any",
-        },
-        "BSc Statistical Data Science": {
-          electives: ["Physics", "Chemistry", "Elective Mathematics"],
-          program: "Any",
-        },
-        "BSc Cyber Security": {
-          electives: ["Physics", "Chemistry", "Elective Mathematics"],
-          program: "Any",
-        },
-        "BSc Information Systems and Technology": {
-          electives: ["Physics", "Chemistry", "Elective Mathematics"],
-          program: "Any",
-        },
-        "BSc Logistics and Transport Management": {
-          electives: ["Economics", "Accounting", "Business Management"],
-          program: "Any",
-        },
-        "BSc Economics and Industrial Organization": {
-          electives: ["Economics", "Accounting", "Business Management"],
-          program: "Any",
-        },
+        // Additional courses...
       };
 
-      // Initialize form elements
       const form = document.getElementById("applicationForm");
       const programSelect = document.getElementById("program");
       const gradeInputs = document.getElementById("gradeInputs");
@@ -233,61 +151,58 @@
       const explanationMessage = document.getElementById("explanationMessage");
       const applicantList = document.getElementById("applicantList");
 
-      // Populate grade inputs when program is selected
       programSelect.addEventListener("change", () => {
         const selectedProgram = programSelect.value;
         gradeInputs.innerHTML = "";
         if (selectedProgram) {
           subjects[selectedProgram].forEach((subject) => {
             gradeInputs.innerHTML += `
-                        <div>
-                            <label for="${subject}" class="block text-sm font-medium text-gray-700">${subject}</label>
-                            <select id="${subject}" name="${subject}" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
-                                <option value="">Select grade</option>
-                                <option value="A1">A1</option>
-                                <option value="B2">B2</option>
-                                <option value="B3">B3</option>
-                                <option value="C4">C4</option>
-                                <option value="C5">C5</option>
-                                <option value="C6">C6</option>
-                                <option value="D7">D7</option>
-                                <option value="E8">E8</option>
-                                <option value="F9">F9</option>
-                            </select>
-                        </div>
-                    `;
+            <div>
+              <label for="${subject}" class="block text-sm font-medium text-gray-700">${subject}</label>
+              <select id="${subject}" name="${subject}" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+                <option value="">Select grade</option>
+                <option value="A1">A1</option>
+                <option value="B2">B2</option>
+                <option value="B3">B3</option>
+                <option value="C4">C4</option>
+                <option value="C5">C5</option>
+                <option value="C6">C6</option>
+                <option value="D7">D7</option>
+                <option value="E8">E8</option>
+                <option value="F9">F9</option>
+              </select>
+            </div>
+          `;
           });
         }
         populateCourseChoices(selectedProgram);
       });
 
-      // Populate course choices based on program
       function populateCourseChoices(program) {
         courseChoices.innerHTML = "";
         for (let i = 1; i <= 4; i++) {
           courseChoices.innerHTML += `
-                    <div>
-                        <label for="choice${i}" class="block text-sm font-medium text-gray-700">Choice ${i}</label>
-                        <select id="choice${i}" name="choice${i}" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
-                            <option value="">Select course</option>
-                            ${Object.entries(courses)
-                              .filter(
-                                ([_, courseInfo]) =>
-                                  courseInfo.program === program ||
-                                  courseInfo.program === "Any"
-                              )
-                              .map(
-                                ([course, _]) =>
-                                  `<option value="${course}">${course}</option>`
-                              )
-                              .join("")}
-                        </select>
-                    </div>
-                `;
+          <div>
+            <label for="choice${i}" class="block text-sm font-medium text-gray-700">Choice ${i}</label>
+            <select id="choice${i}" name="choice${i}" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+              <option value="">Select course</option>
+              ${Object.entries(courses)
+                .filter(
+                  ([_, courseInfo]) =>
+                    courseInfo.program === program ||
+                    courseInfo.program === "Any"
+                )
+                .map(
+                  ([course, _]) =>
+                    `<option value="${course}">${course}</option>`
+                )
+                .join("")}
+            </select>
+          </div>
+        `;
         }
       }
 
-      // Handle form submission
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
         const formData = new FormData(form);
@@ -307,11 +222,9 @@
           applicantData.grades[subject] = formData.get(subject);
         });
 
-        // Calculate aggregate
         const aggregate = calculateAggregate(applicantData);
         applicantData.aggregate = aggregate;
 
-        // Save applicant data to Firestore
         try {
           await db.collection("applicants").add(applicantData);
           console.log("Application submitted successfully");
@@ -319,30 +232,21 @@
           console.error("Error submitting application: ", error);
         }
 
-        // Simulate selection process
         const selectionResult = await simulateSelection(applicantData);
 
-        // Display results
         results.classList.remove("hidden");
         if (selectionResult.selected) {
-          resultMessage.textContent = `Congratulations! You have been selected for ${selectionResult.course} (${selectionResult.type}).`;
+          resultMessage.textContent = `Congratulations! You have been selected for ${selectionResult.course}.`;
         } else {
           resultMessage.textContent =
             "Unfortunately, you were not selected for any of your chosen courses.";
         }
         explanationMessage.textContent = selectionResult.explanation;
 
-        // Refresh the applicant list
         loadApplicants();
       });
 
-      // Calculate aggregate
       function calculateAggregate(applicantData) {
-        const coreSubjects = [
-          "English Language",
-          "Mathematics",
-          "Integrated Science",
-        ];
         const gradePoints = {
           A1: 1,
           B2: 2,
@@ -354,95 +258,50 @@
           E8: 8,
           F9: 9,
         };
-
-        let totalPoints = coreSubjects.reduce(
-          (sum, subject) => sum + gradePoints[applicantData.grades[subject]],
-          0
-        );
-
-        // Find the best 3 elective subjects
-        const electiveSubjects = Object.keys(applicantData.grades).filter(
-          (subject) => !coreSubjects.includes(subject)
-        );
-        const electivePoints = electiveSubjects
-          .map((subject) => gradePoints[applicantData.grades[subject]])
-          .sort((a, b) => a - b)
-          .slice(0, 3);
-
-        totalPoints += electivePoints.reduce((sum, points) => sum + points, 0);
-
+        let totalPoints = 0;
+        for (const subject in applicantData.grades) {
+          totalPoints += gradePoints[applicantData.grades[subject]] || 0;
+        }
         return totalPoints;
       }
 
-      // Simulate selection process
       async function simulateSelection(applicantData) {
-        const allApplicants = await db.collection("applicants").get();
-        const applicantsData = allApplicants.docs.map((doc) => doc.data());
+        let selected = false;
+        let selectedCourse = null;
+        let explanation = "";
 
-        for (const course of applicantData.choices) {
-          const courseInfo = courses[course];
-          const courseApplicants = applicantsData.filter((app) =>
-            app.choices.includes(course)
-          );
-          const cutoffAggregate = calculateCutoffAggregate(courseApplicants);
-
-          if (applicantData.aggregate <= cutoffAggregate) {
-            // Check if the applicant has the required electives
-            const hasRequiredElectives = courseInfo.electives.every(
-              (elective) =>
-                applicantData.grades[elective] &&
-                ["A1", "B2", "B3", "C4", "C5", "C6"].includes(
-                  applicantData.grades[elective]
-                )
+        for (const choice of applicantData.choices) {
+          if (choice && courses[choice]) {
+            const courseInfo = courses[choice];
+            const meetsElectiveRequirements = courseInfo.electives.every(
+              (subject) =>
+                ["A1", "B2", "B3"].includes(applicantData.grades[subject])
             );
-
-            if (hasRequiredElectives) {
-              const type =
-                applicantData.aggregate <= 36 ? "Regular" : "Fee-paying";
-              return {
-                selected: true,
-                course: course,
-                type: type,
-                explanation: `Your aggregate of ${applicantData.aggregate} meets the cutoff of ${cutoffAggregate} for ${course}. You have been selected for ${type} admission.`,
-              };
+            if (
+              meetsElectiveRequirements &&
+              applicantData.aggregate <= courseInfo.cutoff
+            ) {
+              selected = true;
+              selectedCourse = choice;
+              break;
             } else {
-              return {
-                selected: false,
-                explanation: `Your aggregate of ${applicantData.aggregate} meets the cutoff of ${cutoffAggregate} for ${course}, but you don't have the required elective subjects or grades.`,
-              };
+              explanation += `You did not meet the elective or cutoff requirements for ${choice}. `;
             }
           }
         }
 
-        return {
-          selected: false,
-          explanation: `Your aggregate of ${applicantData.aggregate} does not meet the cutoff for any of your chosen courses.`,
-        };
+        return { selected, course: selectedCourse, explanation };
       }
 
-      // Calculate cutoff aggregate for a course
-      function calculateCutoffAggregate(applicants) {
-        if (applicants.length === 0) return 36; // Default cutoff if no applicants
-        const sortedAggregates = applicants
-          .map((app) => app.aggregate)
-          .sort((a, b) => a - b);
-        const cutoffIndex = Math.floor(applicants.length * 0.7); // Top 70% of applicants
-        return sortedAggregates[cutoffIndex] || 36;
-      }
-
-      // Load and display all applicants
       async function loadApplicants() {
-        const allApplicants = await db.collection("applicants").get();
+        const snapshot = await db.collection("applicants").get();
         applicantList.innerHTML = "";
-        allApplicants.forEach((doc) => {
-          const data = doc.data();
-          const li = document.createElement("li");
-          li.textContent = `${data.name}: ${data.program} - Aggregate: ${data.aggregate}`;
-          applicantList.appendChild(li);
+        snapshot.forEach((doc) => {
+          const applicant = doc.data();
+          applicantList.innerHTML += `<li>${applicant.name} - Program: ${applicant.program}, Aggregate: ${applicant.aggregate}</li>`;
         });
       }
 
-      // Initial load of applicants
       loadApplicants();
     </script>
   </body>
