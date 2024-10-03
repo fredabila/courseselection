@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UMaT Application Simulator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  </head>
+  <body class="bg-gray-100 min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto space-y-8">
+      <div class="bg-white shadow-xl rounded-lg p-6">
+        <h1 class="text-2xl font-bold text-center text-gray-900 mb-2">
+          UMaT Application Simulator
+        </h1>
+        <p class="text-center text-gray-600 mb-6">
+          University of Mines and Technology
+        </p>
+
+        <form id="applicationForm" class="space-y-6">
+          <div>
+            <label for="name" class="block text-sm font-medium text-gray-700"
+              >Full Name</label
+            >
+            <input
+              type="text"
+              id="name"
+              name="name"
+              required
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+            />
+          </div>
+
+          <div>
+            <label for="program" class="block text-sm font-medium text-gray-700"
+              >Program</label
+            >
+            <select
+              id="program"
+              name="program"
+              required
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+            >
+              <option value="">Select program</option>
+              <option value="General Science">General Science</option>
+              <option value="General Arts">General Arts</option>
+              <option value="Business">Business</option>
+            </select>
+          </div>
+
+          <div id="gradeInputs" class="space-y-4">
+            <h2 class="text-lg font-semibold">Enter your grades</h2>
+            <!-- Grade inputs will be dynamically added here -->
+          </div>
+
+          <div id="courseChoices" class="space-y-4">
+            <h2 class="text-lg font-semibold">
+              Select your course choices (in order of preference)
+            </h2>
+            <!-- Course choice selects will be dynamically added here -->
+          </div>
+
+          <button
+            type="submit"
+            class="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
+          >
+            Submit Application
+          </button>
+        </form>
+      </div>
+
+      <div id="results" class="bg-white shadow-xl rounded-lg p-6 hidden">
+        <h2 class="text-xl font-bold text-gray-900 mb-4">
+          Application Results
+        </h2>
+        <p id="resultMessage" class="text-lg text-gray-700"></p>
+      </div>
+    </div>
+
+    <script>
+      // Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyBacLqR9vocAWwV2o_KohKDA1v2noG82SI",
+        authDomain: "buzz-chat-17759.firebaseapp.com",
+        projectId: "buzz-chat-17759",
+        storageBucket: "buzz-chat-17759.appspot.com",
+        messagingSenderId: "996339174890",
+        appId: "1:996339174890:web:1ef3be0931143f91823693",
+        measurementId: "G-3V7YT7YPB6",
+      };
+
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+
+      // Define subjects for each program
+      const subjects = {
+        "General Science": [
+          "English Language",
+          "Mathematics",
+          "Integrated Science",
+          "Physics",
+          "Chemistry",
+          "Elective Mathematics",
+          "Biology",
+        ],
+        "General Arts": [
+          "English Language",
+          "Mathematics",
+          "Integrated Science",
+          "Economics",
+          "Geography",
+          "History",
+          "Literature",
+        ],
+        Business: [
+          "English Language",
+          "Mathematics",
+          "Integrated Science",
+          "Economics",
+          "Accounting",
+          "Business Management",
+          "Financial Mathematics",
+        ],
+      };
+
+      // Define courses and their competitiveness (1-10, 10 being most competitive)
+      const courses = {
+        "BSc Mining Engineering": {
+          competitiveness: 9,
+          program: "General Science",
+        },
+        "BSc Petroleum Engineering": {
+          competitiveness: 10,
+          program: "General Science",
+        },
+        "BSc Computer Science and Engineering": {
+          competitiveness: 8,
+          program: "General Science",
+        },
+        "BSc Electrical and Electronic Engineering": {
+          competitiveness: 8,
+          program: "General Science",
+        },
+        "BSc Renewable Energy Engineering": {
+          competitiveness: 7,
+          program: "General Science",
+        },
+        "BSc Mathematics": { competitiveness: 6, program: "Any" },
+        "BSc Geomatic Engineering": {
+          competitiveness: 7,
+          program: "General Science",
+        },
+        "BSc Environmental and Safety Engineering": {
+          competitiveness: 6,
+          program: "General Science",
+        },
+        "BSc Mechanical Engineering": {
+          competitiveness: 8,
+          program: "General Science",
+        },
+        "BSc Geological Engineering": {
+          competitiveness: 7,
+          program: "General Science",
+        },
+        "BSc Minerals Engineering": {
+          competitiveness: 7,
+          program: "General Science",
+        },
+        "BSc Chemical Engineering": {
+          competitiveness: 8,
+          program: "General Science",
+        },
+        "BSc Petroleum Geosciences Engineering": {
+          competitiveness: 8,
+          program: "General Science",
+        },
+        "BSc Land Administration and Information Systems": {
+          competitiveness: 5,
+          program: "Any",
+        },
+        "BSc Economics and Industrial Organization": {
+          competitiveness: 6,
+          program: "Any",
+        },
+        "BSc Accounting with Computing": {
+          competitiveness: 7,
+          program: "Business",
+        },
+        "BSc Business Administration": {
+          competitiveness: 6,
+          program: "Business",
+        },
+        "BSc Logistics and Transport Management": {
+          competitiveness: 5,
+          program: "Any",
+        },
+      };
+
+      // Initialize form elements
+      const form = document.getElementById("applicationForm");
+      const programSelect = document.getElementById("program");
+      const gradeInputs = document.getElementById("gradeInputs");
+      const courseChoices = document.getElementById("courseChoices");
+      const results = document.getElementById("results");
+      const resultMessage = document.getElementById("resultMessage");
+
+      // Populate grade inputs when program is selected
+      programSelect.addEventListener("change", () => {
+        const selectedProgram = programSelect.value;
+        gradeInputs.innerHTML = "";
+        if (selectedProgram) {
+          subjects[selectedProgram].forEach((subject) => {
+            gradeInputs.innerHTML += `
+                        <div>
+                            <label for="${subject}" class="block text-sm font-medium text-gray-700">${subject}</label>
+                            <select id="${subject}" name="${subject}" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+                                <option value="">Select grade</option>
+                                <option value="A1">A1</option>
+                                <option value="B2">B2</option>
+                                <option value="B3">B3</option>
+                                <option value="C4">C4</option>
+                                <option value="C5">C5</option>
+                                <option value="C6">C6</option>
+                                <option value="D7">D7</option>
+                                <option value="E8">E8</option>
+                                <option value="F9">F9</option>
+                            </select>
+                        </div>
+                    `;
+          });
+        }
+        populateCourseChoices(selectedProgram);
+      });
+
+      // Populate course choices based on program
+      function populateCourseChoices(program) {
+        courseChoices.innerHTML = "";
+        for (let i = 1; i <= 4; i++) {
+          courseChoices.innerHTML += `
+                    <div>
+                        <label for="choice${i}" class="block text-sm font-medium text-gray-700">Choice ${i}</label>
+                        <select id="choice${i}" name="choice${i}" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+                            <option value="">Select course</option>
+                            ${Object.entries(courses)
+                              .filter(
+                                ([_, courseInfo]) =>
+                                  courseInfo.program === program ||
+                                  courseInfo.program === "Any"
+                              )
+                              .map(
+                                ([course, _]) =>
+                                  `<option value="${course}">${course}</option>`
+                              )
+                              .join("")}
+                        </select>
+                    </div>
+                `;
+        }
+      }
+
+      // Handle form submission
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const formData = new FormData(form);
+        const applicantData = {
+          name: formData.get("name"),
+          program: formData.get("program"),
+          grades: {},
+          choices: [
+            formData.get("choice1"),
+            formData.get("choice2"),
+            formData.get("choice3"),
+            formData.get("choice4"),
+          ],
+        };
+
+        subjects[applicantData.program].forEach((subject) => {
+          applicantData.grades[subject] = formData.get(subject);
+        });
+
+        // Save applicant data to Firestore
+        try {
+          await db.collection("applicants").add(applicantData);
+          console.log("Application submitted successfully");
+        } catch (error) {
+          console.error("Error submitting application: ", error);
+        }
+
+        // Simulate selection process
+        const selectedCourse = simulateSelection(applicantData);
+
+        // Display results
+        results.classList.remove("hidden");
+        if (selectedCourse) {
+          resultMessage.textContent = `Congratulations! You have been selected for ${selectedCourse}.`;
+        } else {
+          resultMessage.textContent =
+            "Unfortunately, you were not selected for any of your chosen courses.";
+        }
+      });
+
+      // Simulate selection process
+      function simulateSelection(applicantData) {
+        const gradePoints = {
+          A1: 1,
+          B2: 2,
+          B3: 3,
+          C4: 4,
+          C5: 5,
+          C6: 6,
+          D7: 7,
+          E8: 8,
+          F9: 9,
+        };
+
+        // Calculate average grade point
+        const totalPoints = Object.values(applicantData.grades).reduce(
+          (sum, grade) => sum + gradePoints[grade],
+          0
+        );
+        const avgGradePoint =
+          totalPoints / Object.keys(applicantData.grades).length;
+
+        // Adjust score based on program competitiveness
+        const adjustedScores = applicantData.choices.map((course) => {
+          const courseInfo = courses[course];
+          if (!courseInfo) return 0;
+          const competitivenessAdjustment =
+            (11 - courseInfo.competitiveness) / 10;
+          return (10 - avgGradePoint) * competitivenessAdjustment;
+        });
+
+        // Find the highest adjusted score above a threshold (e.g., 5)
+        const threshold = 5;
+        const selectedCourseIndex = adjustedScores.findIndex(
+          (score) => score > threshold
+        );
+
+        return selectedCourseIndex !== -1
+          ? applicantData.choices[selectedCourseIndex]
+          : null;
+      }
+    </script>
+  </body>
+</html>
